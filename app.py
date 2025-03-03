@@ -1,3 +1,7 @@
+import os
+os.environ["HF_HUB_ENABLE_HF_TRANSFER"]='1'
+from huggingface_hub import snapshot_download
+        snapshot_download(repo_id=model_id,allow_patterns=["*.safetensors"])
 import torch
 from diffusers import (
     StableDiffusionXLPipeline, 
@@ -6,11 +10,12 @@ from diffusers import (
 )
 from io import BytesIO
 import base64
-import os
 
 
 class InferlessPythonModel:
     def initialize(self):
+        model_id = "cagliostrolab/animagine-xl-3.0"
+        snapshot_download(repo_id=model_id,allow_patterns=["*.safetensors"])
         # Load VAE component
         self.vae = AutoencoderKL.from_pretrained(
             "madebyollin/sdxl-vae-fp16-fix", 
@@ -19,7 +24,7 @@ class InferlessPythonModel:
         
         # Configure the pipeline
         self.pipe = StableDiffusionXLPipeline.from_pretrained(
-            "cagliostrolab/animagine-xl-3.0", 
+            model_id, 
             vae=self.vae,
             torch_dtype=torch.float16, 
             use_safetensors=True, 
